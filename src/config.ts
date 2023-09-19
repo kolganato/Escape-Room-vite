@@ -16,6 +16,7 @@ export enum AppRoute {
   Login = '/login',
   NotFound = '*',
   MyQuests = '/my-quests',
+  Contacts = '/contacts',
 }
 
 export const QUEST_THEMES = [
