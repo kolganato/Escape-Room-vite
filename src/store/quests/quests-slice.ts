@@ -9,6 +9,7 @@ import {
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
 import { Reservation } from '../../types/reservation';
+import { fetchQuestsAction } from '../api-actions';
 
 export type QuestsState = {
   quests: QuestPreview[];
