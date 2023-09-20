@@ -1,4 +1,4 @@
-import { AppDispatch } from '../store/store';
+import { AppDispatch, State } from '../store/store';
 import { AxiosInstance } from 'axios';
 
 export type CombinedType = {

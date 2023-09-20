@@ -19,17 +19,57 @@ export enum AppRoute {
   Contacts = '/contacts',
 }
 
-export const QUEST_THEMES = [
-  'Все квесты',
-  'Приключения',
-  'Ужасы',
-  'Мистика',
-  'Детектив',
-  'Sci-fi',
-];
+export enum APIRoute {
+  Quest = '/quest',
+  Reservation = '/reservation',
+  Login = '/login',
+  Logout = '/logout',
+}
 
-export const DEFAULT_QUEST_THEME = QUEST_THEMES[0];
+export enum TypeLevel {
+  Adventures = 'adventures',
+  Horror = 'horror',
+  Mystic = 'mystic',
+  Detective = 'detective',
+  SciFi = 'sci-fi',
+  All = 'all',
+}
 
-export const DIFFICULTY_LEVEL = ['любой', 'простой', 'средний', 'сложный'];
+export const LEVEL_TYPES = {
+  [TypeLevel.All]: 'Все квесты',
+  [TypeLevel.Adventures]: 'Приключения',
+  [TypeLevel.Horror]: 'Ужасы',
+  [TypeLevel.Mystic]: 'Мистика',
+  [TypeLevel.Detective]: 'Детектив',
+  [TypeLevel.SciFi]: 'Sci-fi',
+};
 
-export const DEFAULT_DIFFICULTY_LEVEL = DIFFICULTY_LEVEL[0];
+export const DEFAULT_LEVEL_TYPES = TypeLevel.All;
+
+export enum Level {
+  Easy = 'easy',
+  Medium = 'medium',
+  Hard = 'hard',
+  All = 'all',
+}
+
+export const LEVELS = {
+  [Level.All]: 'любой',
+  [Level.Easy]: 'простой',
+  [Level.Medium]: 'средний',
+  [Level.Hard]: 'сложный',
+};
+
+export const DEFAULT_LEVELS = Level.All;
+
+export enum Date {
+  Today = 'today',
+  Tomorrow = 'tomorrow',
+}
+
+export enum Status {
+  Idle = 'idle',
+  Loading = 'loading',
+  Success = 'success',
+  Error = 'error',
+}
