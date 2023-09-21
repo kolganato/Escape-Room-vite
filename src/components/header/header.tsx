@@ -1,41 +1,71 @@
+import { Link } from 'react-router-dom';
+import { AppRoute, AuthorizationStatus } from '../../config';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getAuthorizationStatus } from '../../store/user/selector';
+import { logoutAction } from '../../store/api-actions';
+
 function Header(): JSX.Element {
+  const dispatch = useAppDispatch();
+
+  const authStatus = useAppSelector(getAuthorizationStatus);
+  const isAuth = authStatus === AuthorizationStatus.Auth;
+
   return (
     <header className="header">
       <div className="container container--size-l">
-        <span className="logo header__logo">
+        <Link to={AppRoute.Root} className="logo header__logo">
           <svg width={134} height={52} aria-hidden="true">
             <use xlinkHref="#logo" />
           </svg>
-        </span>
+        </Link>
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">
-              <a className="link active" href="index.html">
+              <Link className="link active" to={AppRoute.Root}>
                 Квесты
-              </a>
+              </Link>
             </li>
             <li className="main-nav__item">
-              <a className="link" href="contacts.html">
+              <Link className="link" to={AppRoute.Contacts}>
                 Контакты
-              </a>
+              </Link>
             </li>
-            <li className="main-nav__item">
-              <a className="link" href="my-quests.html">
-                Мои бронирования
-              </a>
-            </li>
+            {isAuth && (
+              <li className="main-nav__item">
+                <Link className="link" to={AppRoute.MyQuests}>
+                  Мои бронирования
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
         <div className="header__side-nav">
-          <a className="btn btn--accent header__side-item" href="#">
-            Выйти
-          </a>
-          <a
+          {isAuth && (
+            <Link
+              className="btn btn--accent header__side-item"
+              to="#"
+              onClick={(evt) => {
+                evt.preventDefault();
+                dispatch(logoutAction());
+              }}
+            >
+              Выйти
+            </Link>
+          )}
+          {!isAuth && (
+            <Link
+              className="btn header__side-item header__login-btn"
+              to={AppRoute.Login}
+            >
+              Вход
+            </Link>
+          )}
+          <Link
             className="link header__side-item header__phone-link"
-            href="tel:88003335599"
+            to="tel:88003335599"
           >
             8 (000) 111-11-11
-          </a>
+          </Link>
         </div>
       </div>
     </header>
