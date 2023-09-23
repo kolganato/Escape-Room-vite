@@ -1,5 +1,5 @@
 import browserHistory from '../../browser-history';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { AppRoute, AuthorizationStatus } from '../../config';
 import Layout from '../layout';
 import MainPage from '../../pages/main';
