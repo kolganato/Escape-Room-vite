@@ -9,7 +9,7 @@ import {
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
 import { Reservation } from '../../types/reservation';
-import { fetchQuestsAction } from '../api-actions';
+import { fetchQuestsAction, fetchReservationAction } from '../api-actions';
 
 export type QuestsState = {
   quests: QuestPreview[];
@@ -52,6 +52,12 @@ const questsSlice = createSlice({
     ) => {
       state.isReservationLoading = payload;
     },
+    setCurrentLevel: (state, { payload }: PayloadAction<Level>) => {
+      state.currentLevel = payload;
+    },
+    setCurrentTypeLevel: (state, { payload }: PayloadAction<TypeLevel>) => {
+      state.currentTypeLevel = payload;
+    },
   },
   extraReducers(builder) {
     builder
@@ -65,10 +71,28 @@ const questsSlice = createSlice({
       .addCase(fetchQuestsAction.rejected, (state) => {
         state.isQuestsLoading = false;
         state.hasError = true;
+      })
+      .addCase(fetchReservationAction.pending, (state) => {
+        state.hasError = false;
+      })
+      .addCase(fetchReservationAction.fulfilled, (state, { payload }) => {
+        state.reservation = payload;
+        state.isReservationLoading = true;
+      })
+      .addCase(fetchReservationAction.rejected, (state) => {
+        state.isReservationLoading = false;
+        state.hasError = true;
       });
   },
 });
 
-export const {switchLevel, switchTypeLevel, setQuestsLoadingStatus, setReservationLoadingStatus} = questsSlice.actions;
+export const {
+  switchLevel,
+  switchTypeLevel,
+  setQuestsLoadingStatus,
+  setReservationLoadingStatus,
+  setCurrentLevel,
+  setCurrentTypeLevel,
+} = questsSlice.actions;
 
 export default questsSlice.reducer;

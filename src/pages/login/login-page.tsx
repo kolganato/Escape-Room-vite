@@ -9,6 +9,7 @@ import {
 import { setLoginStatus } from '../../store/user/user-slice';
 import { loginAction } from '../../store/api-actions';
 import { Helmet } from 'react-helmet-async';
+import browserHistory from '../../browser-history';
 
 function LoginPage(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -29,6 +30,7 @@ function LoginPage(): JSX.Element {
 
   useEffect(() => {
     if (authStatus === AuthorizationStatus.Auth) {
+      browserHistory.back();
       dispatch(redirectToRoute(AppRoute.Root));
     }
   }, [dispatch, authStatus]);
@@ -173,7 +175,7 @@ function LoginPage(): JSX.Element {
                 type="checkbox"
                 id="id-order-agreement"
                 name="user-agreement"
-                // required
+                required
                 ref={agreementRef}
               />
               <span className="custom-checkbox__icon">

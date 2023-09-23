@@ -5,7 +5,6 @@ import store from './store';
 import { checkAuthStatus } from './store/api-actions';
 import { Provider } from 'react-redux';
 
-
 store.dispatch(checkAuthStatus());
 
 const root = ReactDOM.createRoot(

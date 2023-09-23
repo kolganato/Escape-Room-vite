@@ -32,7 +32,7 @@ export enum TypeLevel {
   Mystic = 'mystic',
   Detective = 'detective',
   SciFi = 'sci-fi',
-  All = 'all',
+  All = 'all-quests',
 }
 
 export const LEVEL_TYPES = {
@@ -54,10 +54,10 @@ export enum Level {
 }
 
 export const LEVELS = {
-  [Level.All]: 'любой',
-  [Level.Easy]: 'простой',
-  [Level.Medium]: 'средний',
-  [Level.Hard]: 'сложный',
+  [Level.All]: 'Любой',
+  [Level.Easy]: 'Простой',
+  [Level.Medium]: 'Средний',
+  [Level.Hard]: 'Сложный',
 };
 
 export const DEFAULT_LEVELS = Level.All;

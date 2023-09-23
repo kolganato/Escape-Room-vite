@@ -7,6 +7,7 @@ import { User } from '../types/user';
 import { AuthData } from '../types/auth-data';
 import { dropToken, saveToken } from '../services/token';
 import { redirectToRoute } from './actions';
+import { Reservation } from '../types/reservation';
 
 export const fetchQuestsAction = createAsyncThunk<
   QuestPreview[],
@@ -37,10 +38,10 @@ export const checkAuthStatus = createAsyncThunk<User, undefined, CombinedType>(
 
 export const loginAction = createAsyncThunk<User, AuthData, CombinedType>(
   'user/login',
-  async ({ login: email, password }, { dispatch, extra: api }) => {
+  async ({ login: email, password }, { extra: api }) => {
     const { data } = await api.post<User>(APIRoute.Login, { email, password });
     saveToken(data.token);
-    dispatch(redirectToRoute(AppRoute.Root));
+    redirectToRoute(AppRoute.Root);
     return data;
   }
 );
@@ -52,3 +53,12 @@ export const logoutAction = createAsyncThunk<void, undefined, CombinedType>(
     dropToken();
   }
 );
+
+export const fetchReservationAction = createAsyncThunk<
+  Reservation[],
+  undefined,
+  CombinedType
+>('quests/fetchReservation', async (_arg, { extra: api }) => {
+  const { data } = await api.get<Reservation[]>(APIRoute.Reservation);
+  return data;
+});
