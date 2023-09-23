@@ -30,7 +30,7 @@ function LoginPage(): JSX.Element {
 
   useEffect(() => {
     if (authStatus === AuthorizationStatus.Auth) {
-      browserHistory.back();
+      // browserHistory.back();
       dispatch(redirectToRoute(AppRoute.Root));
     }
   }, [dispatch, authStatus]);

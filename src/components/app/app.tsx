@@ -34,7 +34,7 @@ function App(): JSX.Element {
     }
   }, [dispatch, authStatus]);
 
-  if(authStatus === AuthorizationStatus.Unknown || !isQuestsLoading){
+  if (authStatus === AuthorizationStatus.Unknown || !isQuestsLoading) {
     return <Spinner />;
   }
 
@@ -44,17 +44,16 @@ function App(): JSX.Element {
         <Routes>
           <Route path={AppRoute.Root} element={<Layout />}>
             <Route index element={<MainPage />} />
-            <Route
-              path={AppRoute.Login}
-              element={
-                <LoginPage />
-              }
-            />
+            <Route path={AppRoute.Login} element={<LoginPage />} />
             <Route path={AppRoute.Quest}>
               <Route path={`${AppRoute.Quest}/:id`} element={<QuestPage />} />
               <Route
                 path={`${AppRoute.Quest}/:id/booking`}
-                element={<QuestBookingPage />}
+                element={
+                  <PrivateRoute authorizationStatus={authStatus}>
+                    <QuestBookingPage />
+                  </PrivateRoute>
+                }
               />
             </Route>
             <Route path={AppRoute.Contacts} element={<ContactsPage />} />
