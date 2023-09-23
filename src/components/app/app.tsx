@@ -19,10 +19,13 @@ import {
 } from '../../store/api-actions';
 import { HelmetProvider } from 'react-helmet-async';
 import HistoryRouter from '../history-route';
+import { getIsQuestsLoading } from '../../store/quests/selector';
+import Spinner from '../spinner';
 
 function App(): JSX.Element {
   const dispatch = useAppDispatch();
   const authStatus = useAppSelector(getAuthorizationStatus);
+  const isQuestsLoading = useAppSelector(getIsQuestsLoading);
 
   useEffect(() => {
     dispatch(fetchQuestsAction());
@@ -30,6 +33,10 @@ function App(): JSX.Element {
       dispatch(fetchReservationAction());
     }
   }, [dispatch, authStatus]);
+
+  if(authStatus === AuthorizationStatus.Unknown || !isQuestsLoading){
+    return <Spinner />;
+  }
 
   return (
     <HelmetProvider>

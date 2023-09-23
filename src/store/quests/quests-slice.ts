@@ -4,12 +4,13 @@ import {
   DEFAULT_LEVEL_TYPES,
   Level,
   NameSpace,
+  Status,
   TypeLevel,
 } from '../../config';
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
 import { Reservation } from '../../types/reservation';
-import { fetchQuestsAction, fetchReservationAction } from '../api-actions';
+import { fetchQuestDetailsAction, fetchQuestsAction, fetchReservationAction } from '../api-actions';
 
 export type QuestsState = {
   quests: QuestPreview[];
@@ -20,6 +21,7 @@ export type QuestsState = {
   currentTypeLevel: TypeLevel;
   reservation: Reservation[];
   isReservationLoading: boolean;
+  statusQuestPageData: Status;
 };
 
 const initialState: QuestsState = {
@@ -31,6 +33,7 @@ const initialState: QuestsState = {
   currentTypeLevel: DEFAULT_LEVEL_TYPES,
   reservation: [],
   isReservationLoading: false,
+  statusQuestPageData: Status.Idle,
 };
 
 const questsSlice = createSlice({
@@ -82,6 +85,16 @@ const questsSlice = createSlice({
       .addCase(fetchReservationAction.rejected, (state) => {
         state.isReservationLoading = false;
         state.hasError = true;
+      })
+      .addCase(fetchQuestDetailsAction.pending, (state) => {
+        state.statusQuestPageData = Status.Loading;
+      })
+      .addCase(fetchQuestDetailsAction.fulfilled, (state, {payload}) => {
+        state.questDetails = payload;
+        state.statusQuestPageData = Status.Success;
+      })
+      .addCase(fetchQuestDetailsAction.rejected, (state) => {
+        state.statusQuestPageData = Status.Error;
       });
   },
 });

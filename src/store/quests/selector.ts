@@ -30,3 +30,14 @@ export const getCurrentTypeLevel = createSelector(
   (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
   (state: QuestsState) => state.currentTypeLevel
 );
+
+export const getQuestDetails = createSelector(
+  (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
+  (state: QuestsState) => state.questDetails
+);
+
+export const getIsQuestsLoading = createSelector(
+  (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
+  (state: QuestsState) => state.isQuestsLoading
+);
+
