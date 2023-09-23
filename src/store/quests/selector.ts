@@ -36,8 +36,17 @@ export const getQuestDetails = createSelector(
   (state: QuestsState) => state.questDetails
 );
 
+export const getBooking = createSelector(
+  (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
+  (state: QuestsState) => state.booking
+);
+
 export const getIsQuestsLoading = createSelector(
   (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
   (state: QuestsState) => state.isQuestsLoading
 );
 
+export const getCurrentBookingAddress = createSelector(
+  (state: Pick<State, NameSpace.Quests>) => state[NameSpace.Quests],
+  (state: QuestsState) => state.currentBookingAddress
+);

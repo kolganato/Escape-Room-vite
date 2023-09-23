@@ -1,15 +1,60 @@
+import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import {
+  getBooking,
+  getCurrentBookingAddress,
+  getQuestDetails,
+} from '../../store/quests/selector';
+import {
+  fetchBookingAction,
+  fetchQuestDetailsAction,
+} from '../../store/api-actions';
+import { useEffect } from 'react';
+import Map from '../../components/map/map';
+import Spinner from '../../components/spinner';
+import { setCurrentBookingAddress } from '../../store/quests/quests-slice';
+import { Booking } from '../../types/booking';
+
 function QuestBookingPage(): JSX.Element {
+  const questId = useParams().id as string;
+  const dispatch = useAppDispatch();
+  const questDetails = useAppSelector(getQuestDetails);
+  const booking = useAppSelector(getBooking);
+  const bookingAddress = useAppSelector(getCurrentBookingAddress);
+
+  useEffect(() => {
+    if (questId) {
+      dispatch(fetchQuestDetailsAction(questId));
+      dispatch(fetchBookingAction(questId));
+    }
+  }, [questId, dispatch]);
+
+  const { coverImg, coverImgWebp, previewImg, previewImgWebp, title } =
+    questDetails;
+
+  if (booking.length === 0) {
+    return <Spinner />;
+  }
+
+  const handleClickMarker = (id: Booking['id']) => {
+    const newBookingAddress = booking.find((address) => address.id === id);
+
+    if (newBookingAddress) {
+      dispatch(setCurrentBookingAddress(newBookingAddress));
+    }
+  };
+
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
           <source
             type="image/webp"
-            srcSet="img/content/maniac/maniac-bg-size-m.webp, img/content/maniac/maniac-bg-size-m@2x.webp 2x"
+            srcSet={`${previewImgWebp}, ${coverImgWebp} 2x`}
           />
           <img
-            src="img/content/maniac/maniac-bg-size-m.jpg"
-            srcSet="img/content/maniac/maniac-bg-size-m@2x.jpg 2x"
+            src={previewImg}
+            srcSet={coverImg}
             width={1366}
             height={1959}
             alt=""
@@ -22,17 +67,23 @@ function QuestBookingPage(): JSX.Element {
             Бронирование квеста
           </h1>
           <p className="title title--size-m title--uppercase page-content__title">
-            Маньяк
+            {title}
           </p>
         </div>
         <div className="page-content__item">
           <div className="booking-map">
             <div className="map">
-              <div className="map__container" />
+              {bookingAddress && (
+                <Map
+                  booking={booking}
+                  location={bookingAddress.location}
+                  selectedIdAddress={bookingAddress.id}
+                  onClickMarker={handleClickMarker}
+                />
+              )}
             </div>
             <p className="booking-map__address">
-              Вы&nbsp;выбрали: наб. реки Карповки&nbsp;5, лит&nbsp;П, м.
-              Петроградская
+              Вы&nbsp;выбрали: {bookingAddress.location.address}
             </p>
           </div>
         </div>
@@ -46,7 +97,20 @@ function QuestBookingPage(): JSX.Element {
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Сегодня</legend>
               <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
+                {bookingAddress.slots.today.map(({ time, isAvailable }) => (
+                  <label className="custom-radio booking-form__date" key={time}>
+                    <input
+                      type="radio"
+                      id="today9h45m"
+                      name="date"
+                      required
+                      defaultValue="today9h45m"
+                      disabled={!isAvailable}
+                    />
+                    <span className="custom-radio__label">{time}</span>
+                  </label>
+                ))}
+                {/* <label className="custom-radio booking-form__date">
                   <input
                     type="radio"
                     id="today9h45m"
@@ -97,7 +161,7 @@ function QuestBookingPage(): JSX.Element {
                     defaultValue="today21h30m"
                   />
                   <span className="custom-radio__label">21:30</span>
-                </label>
+                </label> */}
               </div>
             </fieldset>
             <fieldset className="booking-form__date-section">

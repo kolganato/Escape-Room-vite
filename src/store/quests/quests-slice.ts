@@ -10,30 +10,37 @@ import {
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
 import { Reservation } from '../../types/reservation';
-import { fetchQuestDetailsAction, fetchQuestsAction, fetchReservationAction } from '../api-actions';
+import { fetchBookingAction, fetchQuestDetailsAction, fetchQuestsAction, fetchReservationAction } from '../api-actions';
+import { Booking } from '../../types/booking';
 
 export type QuestsState = {
   quests: QuestPreview[];
   questDetails: QuestDetails;
   isQuestsLoading: boolean;
+  booking: Booking[];
+  currentBookingAddress: Booking;
   hasError: boolean;
   currentLevel: Level;
   currentTypeLevel: TypeLevel;
   reservation: Reservation[];
   isReservationLoading: boolean;
   statusQuestPageData: Status;
+  statusBookingPageData: Status;
 };
 
 const initialState: QuestsState = {
   quests: [],
   questDetails: {} as QuestDetails,
   isQuestsLoading: false,
+  booking: [],
+  currentBookingAddress: {} as Booking,
   hasError: false,
   currentLevel: DEFAULT_LEVELS,
   currentTypeLevel: DEFAULT_LEVEL_TYPES,
   reservation: [],
   isReservationLoading: false,
   statusQuestPageData: Status.Idle,
+  statusBookingPageData: Status.Idle,
 };
 
 const questsSlice = createSlice({
@@ -60,6 +67,9 @@ const questsSlice = createSlice({
     },
     setCurrentTypeLevel: (state, { payload }: PayloadAction<TypeLevel>) => {
       state.currentTypeLevel = payload;
+    },
+    setCurrentBookingAddress: (state, { payload }: PayloadAction<Booking>) => {
+      state.currentBookingAddress = payload;
     },
   },
   extraReducers(builder) {
@@ -95,6 +105,17 @@ const questsSlice = createSlice({
       })
       .addCase(fetchQuestDetailsAction.rejected, (state) => {
         state.statusQuestPageData = Status.Error;
+      })
+      .addCase(fetchBookingAction.pending, (state) => {
+        state.statusQuestPageData = Status.Loading;
+      })
+      .addCase(fetchBookingAction.fulfilled, (state, {payload}) => {
+        state.booking = payload;
+        state.currentBookingAddress = payload[0];
+        state.statusQuestPageData = Status.Success;
+      })
+      .addCase(fetchBookingAction.rejected, (state) => {
+        state.statusQuestPageData = Status.Error;
       });
   },
 });
@@ -106,6 +127,7 @@ export const {
   setReservationLoadingStatus,
   setCurrentLevel,
   setCurrentTypeLevel,
+  setCurrentBookingAddress,
 } = questsSlice.actions;
 
 export default questsSlice.reducer;

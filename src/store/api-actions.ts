@@ -8,6 +8,7 @@ import { AuthData } from '../types/auth-data';
 import { dropToken, saveToken } from '../services/token';
 import { redirectToRoute } from './actions';
 import { Reservation } from '../types/reservation';
+import { Booking } from '../types/booking';
 
 export const fetchQuestsAction = createAsyncThunk<
   QuestPreview[],
@@ -24,6 +25,16 @@ export const fetchQuestDetailsAction = createAsyncThunk<
   CombinedType
 >('quests/fetchQuestDetails', async (questId, { extra: api }) => {
   const { data } = await api.get<QuestDetails>(`${APIRoute.Quest}/${questId}`);
+
+  return data;
+});
+
+export const fetchBookingAction = createAsyncThunk<
+  Booking[],
+  string,
+  CombinedType
+>('quests/fetchBooking', async (questId, { extra: api }) => {
+  const { data } = await api.get<Booking[]>(`${APIRoute.Quest}/${questId}/booking`);
 
   return data;
 });
