@@ -3,17 +3,12 @@ import { AppRoute, AuthorizationStatus } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthorizationStatus } from '../../store/user/selector';
 import { logoutAction } from '../../store/api-actions';
-import classNames from 'classnames';
-import browserHistory from '../../browser-history';
-import { useState } from 'react';
 
 function Header(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const authStatus = useAppSelector(getAuthorizationStatus);
   const isAuth = authStatus === AuthorizationStatus.Auth;
-
-  const [currentPage, setCurrentPage] = useState(location.pathname);
 
   return (
     <header className="header">
