@@ -1,8 +1,9 @@
+import { Date } from '../config';
 import { Day } from './day';
 
 export type Slots = {
   slots: {
-    today: Day[];
-    tomorrow: Day[];
+    [Date.Today]: Day[];
+    [Date.Tomorrow]: Day[];
   };
 };

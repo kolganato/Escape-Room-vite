@@ -67,6 +67,11 @@ export enum Date {
   Tomorrow = 'tomorrow',
 }
 
+export const DAYS_RU = {
+  [Date.Today]: 'сегодня',
+  [Date.Tomorrow]: 'завтра',
+};
+
 export enum Status {
   Idle = 'idle',
   Loading = 'loading',

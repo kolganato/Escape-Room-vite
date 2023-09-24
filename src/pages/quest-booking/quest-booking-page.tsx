@@ -6,14 +6,29 @@ import {
   getQuestDetails,
 } from '../../store/quests/selector';
 import {
+  bookingQuestAction,
   fetchBookingAction,
   fetchQuestDetailsAction,
+  fetchReservationAction,
 } from '../../store/api-actions';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Map from '../../components/map/map';
 import Spinner from '../../components/spinner';
 import { setCurrentBookingAddress } from '../../store/quests/quests-slice';
 import { Booking } from '../../types/booking';
+import { useForm } from 'react-hook-form';
+import { formateDateForPost, formateTimeForForm } from '../../utils/common';
+import { redirectToRoute } from '../../store/actions';
+import { AppRoute } from '../../config';
+
+type FormData = {
+  date: string;
+  contactPerson: string;
+  phone: string;
+  peopleCount: number;
+  withChildren: boolean;
+  placeId: Booking['id'];
+};
 
 function QuestBookingPage(): JSX.Element {
   const questId = useParams().id as string;
@@ -21,6 +36,13 @@ function QuestBookingPage(): JSX.Element {
   const questDetails = useAppSelector(getQuestDetails);
   const booking = useAppSelector(getBooking);
   const bookingAddress = useAppSelector(getCurrentBookingAddress);
+  const { register, handleSubmit } = useForm<FormData>();
+
+  const loginRef = useRef();
+  const phoneRef = useRef();
+
+  // const loginReg = /^[а-яА-ЯёЁa-zA-Z'- ]{1,}$/;
+  // const passwordReg = /^[0-9]{10,}$/;
 
   useEffect(() => {
     if (questId) {
@@ -42,6 +64,23 @@ function QuestBookingPage(): JSX.Element {
     if (newBookingAddress) {
       dispatch(setCurrentBookingAddress(newBookingAddress));
     }
+  };
+
+  const onSubmit = (data: FormData) => {
+    const date = formateDateForPost(data.date);
+
+    const preparedData = { ...data, date: date.date, time: date.time, peopleCount: Number(data.peopleCount) };
+
+    dispatch(
+      bookingQuestAction({
+        formData: preparedData,
+        id: questId,
+      })
+    );
+
+    dispatch(fetchReservationAction());
+
+    dispatch(redirectToRoute(AppRoute.MyQuests));
   };
 
   return (
@@ -91,7 +130,13 @@ function QuestBookingPage(): JSX.Element {
           className="booking-form"
           action="https://echo.htmlacademy.ru/"
           method="post"
+          onSubmit={handleSubmit(onSubmit)}
         >
+          <input
+            type="hidden"
+            {...register('placeId')}
+            defaultValue={bookingAddress.id}
+          />
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
             <fieldset className="booking-form__date-section">
@@ -101,124 +146,35 @@ function QuestBookingPage(): JSX.Element {
                   <label className="custom-radio booking-form__date" key={time}>
                     <input
                       type="radio"
-                      id="today9h45m"
-                      name="date"
+                      id={`today${formateTimeForForm(time)}`}
+                      // name="date"
+                      {...register('date')}
                       required
-                      defaultValue="today9h45m"
+                      defaultValue={`today${formateTimeForForm(time)}`}
                       disabled={!isAvailable}
                     />
                     <span className="custom-radio__label">{time}</span>
                   </label>
                 ))}
-                {/* <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today9h45m"
-                    name="date"
-                    required
-                    defaultValue="today9h45m"
-                  />
-                  <span className="custom-radio__label">9:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today15h00m"
-                    name="date"
-                    defaultChecked
-                    required
-                    defaultValue="today15h00m"
-                  />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today17h30m"
-                    name="date"
-                    required
-                    defaultValue="today17h30m"
-                  />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today19h30m"
-                    name="date"
-                    required
-                    defaultValue="today19h30m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">19:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="today21h30m"
-                    name="date"
-                    required
-                    defaultValue="today21h30m"
-                  />
-                  <span className="custom-radio__label">21:30</span>
-                </label> */}
               </div>
             </fieldset>
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Завтра</legend>
               <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow11h00m"
-                    name="date"
-                    required
-                    defaultValue="tomorrow11h00m"
-                  />
-                  <span className="custom-radio__label">11:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow15h00m"
-                    name="date"
-                    required
-                    defaultValue="tomorrow15h00m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow17h30m"
-                    name="date"
-                    required
-                    defaultValue="tomorrow17h30m"
-                    disabled
-                  />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow19h45m"
-                    name="date"
-                    required
-                    defaultValue="tomorrow19h45m"
-                  />
-                  <span className="custom-radio__label">19:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input
-                    type="radio"
-                    id="tomorrow21h30m"
-                    name="date"
-                    required
-                    defaultValue="tomorrow21h30m"
-                  />
-                  <span className="custom-radio__label">21:30</span>
-                </label>
+                {bookingAddress.slots.today.map(({ time, isAvailable }) => (
+                  <label className="custom-radio booking-form__date" key={time}>
+                    <input
+                      type="radio"
+                      id={`tomorrow${formateTimeForForm(time)}`}
+                      // name="date"
+                      {...register('date')}
+                      required
+                      defaultValue={`tomorrow${formateTimeForForm(time)}`}
+                      disabled={!isAvailable}
+                    />
+                    <span className="custom-radio__label">{time}</span>
+                  </label>
+                ))}
               </div>
             </fieldset>
           </fieldset>
@@ -231,7 +187,8 @@ function QuestBookingPage(): JSX.Element {
               <input
                 type="text"
                 id="name"
-                name="name"
+                // name="name"
+                {...register('contactPerson')}
                 placeholder="Имя"
                 required
                 pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"
@@ -244,7 +201,8 @@ function QuestBookingPage(): JSX.Element {
               <input
                 type="tel"
                 id="tel"
-                name="tel"
+                // name="tel"
+                {...register('phone')}
                 placeholder="Телефон"
                 required
                 pattern="[0-9]{10,}"
@@ -257,7 +215,8 @@ function QuestBookingPage(): JSX.Element {
               <input
                 type="number"
                 id="person"
-                name="person"
+                // name="person"
+                {...register('peopleCount')}
                 placeholder="Количество участников"
                 required
               />
@@ -266,8 +225,8 @@ function QuestBookingPage(): JSX.Element {
               <input
                 type="checkbox"
                 id="children"
-                name="children"
-                defaultChecked
+                // name="children"
+                {...register('withChildren')}
               />
               <span className="custom-checkbox__icon">
                 <svg width={20} height={17} aria-hidden="true">
@@ -290,6 +249,7 @@ function QuestBookingPage(): JSX.Element {
               type="checkbox"
               id="id-order-agreement"
               name="user-agreement"
+              defaultChecked
               required
             />
             <span className="custom-checkbox__icon">

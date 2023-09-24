@@ -9,9 +9,9 @@ import {
 } from '../../config';
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
-import { Reservation } from '../../types/reservation';
 import { fetchBookingAction, fetchQuestDetailsAction, fetchQuestsAction, fetchReservationAction } from '../api-actions';
 import { Booking } from '../../types/booking';
+import { ReservationDetails } from '../../types/api-types';
 
 export type QuestsState = {
   quests: QuestPreview[];
@@ -22,7 +22,7 @@ export type QuestsState = {
   hasError: boolean;
   currentLevel: Level;
   currentTypeLevel: TypeLevel;
-  reservation: Reservation[];
+  reservation: ReservationDetails[];
   isReservationLoading: boolean;
   statusQuestPageData: Status;
   statusBookingPageData: Status;

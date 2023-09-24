@@ -1,6 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { APIRoute, AppRoute } from '../config';
-import { CombinedType } from '../types/api-types';
+import {
+  CombinedFormBookingData,
+  CombinedType,
+  FormBookingData,
+  ReservationDetails,
+} from '../types/api-types';
 import { QuestPreview } from '../types/quest-preview';
 import { QuestDetails } from '../types/quest-details';
 import { User } from '../types/user';
@@ -34,7 +39,22 @@ export const fetchBookingAction = createAsyncThunk<
   string,
   CombinedType
 >('quests/fetchBooking', async (questId, { extra: api }) => {
-  const { data } = await api.get<Booking[]>(`${APIRoute.Quest}/${questId}/booking`);
+  const { data } = await api.get<Booking[]>(
+    `${APIRoute.Quest}/${questId}/booking`
+  );
+
+  return data;
+});
+
+export const bookingQuestAction = createAsyncThunk<
+  ReservationDetails,
+  CombinedFormBookingData,
+  CombinedType
+>('quests/bookingQuest', async ({ formData, id }, { extra: api }) => {
+  const { data } = await api.post<FormBookingData>(
+    `${APIRoute.Quest}/${id}/booking`,
+    formData
+  );
 
   return data;
 });
@@ -66,10 +86,20 @@ export const logoutAction = createAsyncThunk<void, undefined, CombinedType>(
 );
 
 export const fetchReservationAction = createAsyncThunk<
-  Reservation[],
+  ReservationDetails[],
   undefined,
   CombinedType
 >('quests/fetchReservation', async (_arg, { extra: api }) => {
-  const { data } = await api.get<Reservation[]>(APIRoute.Reservation);
+  const { data } = await api.get<ReservationDetails[]>(APIRoute.Reservation);
+  return data;
+});
+
+export const deleteReservationAction = createAsyncThunk<
+  string,
+  ReservationDetails['id'],
+  CombinedType
+>('quests/fetchReservation', async (reservationId, { extra: api }) => {
+  const { data } = await api.delete<ReservationDetails['id']>(`${APIRoute.Reservation}/${reservationId}`);
+  console.log(data);
   return data;
 });
