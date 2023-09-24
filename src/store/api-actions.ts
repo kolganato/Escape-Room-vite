@@ -3,7 +3,6 @@ import { APIRoute, AppRoute } from '../config';
 import {
   CombinedFormBookingData,
   CombinedType,
-  FormBookingData,
   ReservationDetails,
 } from '../types/api-types';
 import { QuestPreview } from '../types/quest-preview';
@@ -12,7 +11,6 @@ import { User } from '../types/user';
 import { AuthData } from '../types/auth-data';
 import { dropToken, saveToken } from '../services/token';
 import { redirectToRoute } from './actions';
-import { Reservation } from '../types/reservation';
 import { Booking } from '../types/booking';
 
 export const fetchQuestsAction = createAsyncThunk<
@@ -51,7 +49,7 @@ export const bookingQuestAction = createAsyncThunk<
   CombinedFormBookingData,
   CombinedType
 >('quests/bookingQuest', async ({ formData, id }, { extra: api }) => {
-  const { data } = await api.post<FormBookingData>(
+  const { data } = await api.post<ReservationDetails>(
     `${APIRoute.Quest}/${id}/booking`,
     formData
   );
@@ -95,11 +93,11 @@ export const fetchReservationAction = createAsyncThunk<
 });
 
 export const deleteReservationAction = createAsyncThunk<
-  string,
+  ReservationDetails['id'],
   ReservationDetails['id'],
   CombinedType
->('quests/fetchReservation', async (reservationId, { extra: api }) => {
-  const { data } = await api.delete<ReservationDetails['id']>(`${APIRoute.Reservation}/${reservationId}`);
-  console.log(data);
-  return data;
+>('quests/deleteReservation', async (reservationId, { extra: api }) => {
+  await api.delete<ReservationDetails['id']>(`${APIRoute.Reservation}/${reservationId}`);
+
+  return reservationId;
 });

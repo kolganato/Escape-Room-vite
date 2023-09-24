@@ -1,12 +1,20 @@
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getReservations } from '../../store/quests/selector';
 import { AppRoute, DAYS_RU, LEVELS } from '../../config';
+import {
+  deleteReservationAction,
+  fetchReservationAction,
+} from '../../store/api-actions';
+import { useEffect } from 'react';
 
 function MyQuestsPage(): JSX.Element {
+  const dispatch = useAppDispatch();
   const reservations = useAppSelector(getReservations);
 
-  console.log(reservations);
+  useEffect(() => {
+    dispatch(fetchReservationAction());
+  }, [dispatch]);
 
   return (
     <main className="page-content decorated-page">
@@ -50,11 +58,16 @@ function MyQuestsPage(): JSX.Element {
                 </div>
                 <div className="quest-card__content">
                   <div className="quest-card__info-wrapper">
-                    <Link className="quest-card__link" to={`${AppRoute.Quest}/${reservation.quest.id}`}>
+                    <Link
+                      className="quest-card__link"
+                      to={`${AppRoute.Quest}/${reservation.quest.id}`}
+                    >
                       {reservation.quest.title}
                     </Link>
                     <span className="quest-card__info">
-                      {`[${DAYS_RU[reservation.date]}, ${reservation.location.address}]`}
+                      {`[${DAYS_RU[reservation.date]}, ${
+                        reservation.location.address
+                      }]`}
                     </span>
                   </div>
                   <ul className="tags quest-card__tags">
@@ -74,6 +87,10 @@ function MyQuestsPage(): JSX.Element {
                   <button
                     className="btn btn--accent btn--secondary quest-card__btn"
                     type="button"
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      dispatch(deleteReservationAction(reservation.id));
+                    }}
                   >
                     Отменить
                   </button>

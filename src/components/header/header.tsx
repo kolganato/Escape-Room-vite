@@ -1,14 +1,19 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { AppRoute, AuthorizationStatus } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthorizationStatus } from '../../store/user/selector';
 import { logoutAction } from '../../store/api-actions';
+import classNames from 'classnames';
+import browserHistory from '../../browser-history';
+import { useState } from 'react';
 
 function Header(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const authStatus = useAppSelector(getAuthorizationStatus);
   const isAuth = authStatus === AuthorizationStatus.Auth;
+
+  const [currentPage, setCurrentPage] = useState(location.pathname);
 
   return (
     <header className="header">
@@ -21,20 +26,29 @@ function Header(): JSX.Element {
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">
-              <Link className="link active" to={AppRoute.Root}>
+              <NavLink
+                className={({ isActive }) => isActive ? 'link active' : 'link'}
+                to={AppRoute.Root}
+              >
                 Квесты
-              </Link>
+              </NavLink>
             </li>
             <li className="main-nav__item">
-              <Link className="link" to={AppRoute.Contacts}>
+              <NavLink
+                className={({ isActive }) => isActive ? 'link active' : 'link'}
+                to={AppRoute.Contacts}
+              >
                 Контакты
-              </Link>
+              </NavLink>
             </li>
             {isAuth && (
               <li className="main-nav__item">
-                <Link className="link" to={AppRoute.MyQuests}>
+                <NavLink
+                  className={({ isActive }) => isActive ? 'link active' : 'link'}
+                  to={AppRoute.MyQuests}
+                >
                   Мои бронирования
-                </Link>
+                </NavLink>
               </li>
             )}
           </ul>

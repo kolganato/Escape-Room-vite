@@ -9,7 +9,14 @@ import {
 } from '../../config';
 import { QuestDetails } from '../../types/quest-details';
 import { QuestPreview } from '../../types/quest-preview';
-import { fetchBookingAction, fetchQuestDetailsAction, fetchQuestsAction, fetchReservationAction } from '../api-actions';
+import {
+  bookingQuestAction,
+  deleteReservationAction,
+  fetchBookingAction,
+  fetchQuestDetailsAction,
+  fetchQuestsAction,
+  fetchReservationAction,
+} from '../api-actions';
 import { Booking } from '../../types/booking';
 import { ReservationDetails } from '../../types/api-types';
 
@@ -26,6 +33,7 @@ export type QuestsState = {
   isReservationLoading: boolean;
   statusQuestPageData: Status;
   statusBookingPageData: Status;
+  statusReservation: Status;
 };
 
 const initialState: QuestsState = {
@@ -41,6 +49,7 @@ const initialState: QuestsState = {
   isReservationLoading: false,
   statusQuestPageData: Status.Idle,
   statusBookingPageData: Status.Idle,
+  statusReservation: Status.Idle,
 };
 
 const questsSlice = createSlice({
@@ -99,7 +108,7 @@ const questsSlice = createSlice({
       .addCase(fetchQuestDetailsAction.pending, (state) => {
         state.statusQuestPageData = Status.Loading;
       })
-      .addCase(fetchQuestDetailsAction.fulfilled, (state, {payload}) => {
+      .addCase(fetchQuestDetailsAction.fulfilled, (state, { payload }) => {
         state.questDetails = payload;
         state.statusQuestPageData = Status.Success;
       })
@@ -109,13 +118,32 @@ const questsSlice = createSlice({
       .addCase(fetchBookingAction.pending, (state) => {
         state.statusQuestPageData = Status.Loading;
       })
-      .addCase(fetchBookingAction.fulfilled, (state, {payload}) => {
+      .addCase(fetchBookingAction.fulfilled, (state, { payload }) => {
         state.booking = payload;
         state.currentBookingAddress = payload[0];
         state.statusQuestPageData = Status.Success;
       })
       .addCase(fetchBookingAction.rejected, (state) => {
         state.statusQuestPageData = Status.Error;
+      })
+      .addCase(deleteReservationAction.pending, (state) => {
+        state.statusReservation = Status.Loading;
+      })
+      .addCase(deleteReservationAction.fulfilled, (state, {payload}) => {
+        state.reservation = [...state.reservation.filter((reservation) => reservation.id !== payload)];
+        state.statusReservation = Status.Success;
+      })
+      .addCase(deleteReservationAction.rejected, (state) => {
+        state.statusReservation = Status.Error;
+      })
+      .addCase(bookingQuestAction.pending, (state) => {
+        state.statusBookingPageData = Status.Loading;
+      })
+      .addCase(bookingQuestAction.fulfilled, (state) => {
+        state.statusBookingPageData = Status.Success;
+      })
+      .addCase(bookingQuestAction.rejected, (state) => {
+        state.statusBookingPageData = Status.Error;
       });
   },
 });
