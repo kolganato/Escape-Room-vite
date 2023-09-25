@@ -10,14 +10,13 @@ import {
   bookingQuestAction,
   fetchBookingAction,
   fetchQuestDetailsAction,
-  fetchReservationAction,
 } from '../../store/api-actions';
 import { useEffect, useRef } from 'react';
 import Map from '../../components/map/map';
 import Spinner from '../../components/spinner';
-import { setCurrentBookingAddress } from '../../store/quests/quests-slice';
+import { setCurrentBookingAddress, setStatusBooking } from '../../store/quests/quests-slice';
 import { Booking } from '../../types/booking';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { formateDateForPost, formateTimeForForm } from '../../utils/common';
 import { redirectToRoute } from '../../store/actions';
 import { AppRoute, Status } from '../../config';
@@ -34,7 +33,6 @@ type FormData = {
 function QuestBookingPage(): JSX.Element {
   const questId = useParams().id as string;
   const dispatch = useAppDispatch();
-  const questDetails = useAppSelector(getQuestDetails);
   const booking = useAppSelector(getBooking);
   const bookingAddress = useAppSelector(getCurrentBookingAddress);
   const statusBooking = useAppSelector(getStatusBooking);
@@ -56,10 +54,13 @@ function QuestBookingPage(): JSX.Element {
   useEffect(() => {
     if (statusBooking === Status.Success) {
       dispatch(redirectToRoute(AppRoute.MyQuests));
+      dispatch(setStatusBooking(Status.Idle));
     }
   }, [statusBooking, dispatch]);
 
-  const { coverImg, coverImgWebp, previewImg, previewImgWebp, title } =
+  const questDetails = useAppSelector(getQuestDetails);
+
+  const { coverImg, coverImgWebp, previewImg, previewImgWebp, title, peopleMinMax } =
     questDetails;
 
   if (booking.length === 0) {
@@ -74,7 +75,7 @@ function QuestBookingPage(): JSX.Element {
     }
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit: SubmitHandler<FormData> = (data: FormData) => {
     const date = formateDateForPost(data.date);
 
     const preparedData = {
@@ -140,7 +141,7 @@ function QuestBookingPage(): JSX.Element {
             className="booking-form"
             action="https://echo.htmlacademy.ru/"
             method="post"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={(evt) => void handleSubmit(onSubmit)(evt)}
           >
             <input
               type="hidden"
@@ -160,7 +161,6 @@ function QuestBookingPage(): JSX.Element {
                       <input
                         type="radio"
                         id={`today${formateTimeForForm(time)}`}
-                        // name="date"
                         {...register('date')}
                         required
                         defaultValue={`today${formateTimeForForm(time)}`}
@@ -182,7 +182,6 @@ function QuestBookingPage(): JSX.Element {
                       <input
                         type="radio"
                         id={`tomorrow${formateTimeForForm(time)}`}
-                        // name="date"
                         {...register('date')}
                         required
                         defaultValue={`tomorrow${formateTimeForForm(time)}`}
@@ -203,7 +202,6 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="text"
                   id="name"
-                  // name="name"
                   {...register('contactPerson')}
                   placeholder="Имя"
                   required
@@ -217,7 +215,6 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="tel"
                   id="tel"
-                  // name="tel"
                   {...register('phone')}
                   placeholder="Телефон"
                   required
@@ -231,19 +228,17 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="number"
                   id="person"
-                  // name="person"
                   {...register('peopleCount')}
                   placeholder="Количество участников"
                   required
-                  min={questDetails.peopleMinMax[0]}
-                  max={questDetails.peopleMinMax[1]}
+                  min={peopleMinMax && peopleMinMax[0]}
+                  max={peopleMinMax && peopleMinMax[1]}
                 />
               </div>
               <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
                 <input
                   type="checkbox"
                   id="children"
-                  // name="children"
                   {...register('withChildren')}
                 />
                 <span className="custom-checkbox__icon">
@@ -262,7 +257,9 @@ function QuestBookingPage(): JSX.Element {
             >
               Забронировать
             </button>
-            {statusBooking === Status.Error && <p>Не удалось забронировать квест</p>}
+            {statusBooking === Status.Error && (
+              <p>Не удалось забронировать квест</p>
+            )}
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--agreement">
               <input
                 type="checkbox"

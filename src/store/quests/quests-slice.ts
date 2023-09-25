@@ -80,6 +80,9 @@ const questsSlice = createSlice({
     setCurrentBookingAddress: (state, { payload }: PayloadAction<Booking>) => {
       state.currentBookingAddress = payload;
     },
+    setStatusBooking: (state, { payload }: PayloadAction<Status>) => {
+      state.statusBookingPageData = payload;
+    }
   },
   extraReducers(builder) {
     builder
@@ -156,6 +159,7 @@ export const {
   setCurrentLevel,
   setCurrentTypeLevel,
   setCurrentBookingAddress,
+  setStatusBooking
 } = questsSlice.actions;
 
 export default questsSlice.reducer;

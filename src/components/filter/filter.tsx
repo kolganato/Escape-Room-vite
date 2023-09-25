@@ -1,11 +1,14 @@
 import { LEVELS, LEVEL_TYPES, Level, TypeLevel } from '../../config';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { setCurrentLevel, setCurrentTypeLevel } from '../../store/quests/quests-slice';
+import {
+  setCurrentLevel,
+  setCurrentTypeLevel,
+} from '../../store/quests/quests-slice';
 import {
   getCurrentLevel,
   getCurrentTypeLevel,
 } from '../../store/quests/selector';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 
 type FormData = {
   level: Level;
@@ -18,16 +21,13 @@ function Filter(): JSX.Element {
   const dispatch = useAppDispatch();
   const { register, handleSubmit } = useForm<FormData>();
 
-  const onChange = (data: FormData): void => {
+  const onChange: SubmitHandler<FormData> = (data: FormData): void => {
     dispatch(setCurrentLevel(data.level));
     dispatch(setCurrentTypeLevel(data.type));
   };
 
   return (
-    <form
-      className="filter"
-      onChange={handleSubmit(onChange)}
-    >
+    <form className="filter" onChange={(evt) => void handleSubmit(onChange)(evt)}>
       <fieldset className="filter__section">
         <legend className="visually-hidden">Тематика</legend>
         <ul className="filter__list">
@@ -37,7 +37,6 @@ function Filter(): JSX.Element {
                 <input
                   {...register('type')}
                   type="radio"
-                  // name="type"
                   id={type}
                   value={type}
                   defaultChecked
@@ -46,7 +45,6 @@ function Filter(): JSX.Element {
               {currentTypeLevel !== type && (
                 <input
                   type="radio"
-                  // name="type"
                   {...register('type')}
                   id={type}
                   value={type}
@@ -75,7 +73,6 @@ function Filter(): JSX.Element {
               {currentLevel === level && (
                 <input
                   type="radio"
-                  // name="level"
                   id={level}
                   value={level}
                   defaultChecked
@@ -85,7 +82,6 @@ function Filter(): JSX.Element {
               {currentLevel !== level && (
                 <input
                   type="radio"
-                  // name="level"
                   id={level}
                   value={level}
                   {...register('level')}
