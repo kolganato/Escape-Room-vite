@@ -97,6 +97,7 @@ function MyQuestsPage(): JSX.Element {
                 </div>
               </div>
             ))}
+          {reservations.length === 0 && <p>Вы ещё ничего не забронировали</p> }
         </div>
       </div>
     </main>
