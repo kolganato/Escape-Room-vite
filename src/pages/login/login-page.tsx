@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { FormEvent, useRef, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { redirectToRoute } from '../../store/actions';
 import { AppRoute, AuthorizationStatus, Status } from '../../config';
 import {
@@ -10,82 +10,39 @@ import { setLoginStatus } from '../../store/user/user-slice';
 import { loginAction } from '../../store/api-actions';
 import { Helmet } from 'react-helmet-async';
 import browserHistory from '../../browser-history';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { AuthData } from '../../types/auth-data';
 
 function LoginPage(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const loginRef = useRef<HTMLInputElement | null>(null);
-  const passwordRef = useRef<HTMLInputElement | null>(null);
-  const agreementRef = useRef<HTMLInputElement | null>(null);
-
   const loginStatus = useAppSelector(getLoginStatus);
   const authStatus = useAppSelector(getAuthorizationStatus);
 
-  const loginRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const passwordRegex = /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]+$/;
-
-  const [isCorrectLogin, setIsCorrectLogin] = useState(true);
-  const [isCorrectPassword, setIsCorrectPassword] = useState(true);
-  const [isCorrectAgreement, setIsCorrectAgreement] = useState(true);
+  const {register, handleSubmit, formState: { errors }} = useForm<AuthData>();
 
   useEffect(() => {
     if (authStatus === AuthorizationStatus.Auth) {
       dispatch(redirectToRoute(AppRoute.Root));
     }
-
-    return () => {
-      browserHistory.back();
-    };
   }, [dispatch, authStatus]);
 
   useEffect(() => {
     if (
-      loginStatus === Status.Success &&
-      loginRef.current &&
-      passwordRef.current &&
-      agreementRef.current
+      loginStatus === Status.Success
     ) {
       dispatch(setLoginStatus(Status.Idle));
-      loginRef.current.value = '';
-      passwordRef.current.value = '';
-      agreementRef.current.value = '';
       dispatch(redirectToRoute(AppRoute.Root));
     }
   }, [dispatch, loginStatus]);
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    setIsCorrectLogin(true);
-    setIsCorrectPassword(true);
-    setIsCorrectAgreement(true);
-
-    if (
-      loginRef.current !== null &&
-      passwordRef.current !== null &&
-      agreementRef.current !== null
-    ) {
-      if (!passwordRegex.test(passwordRef.current.value)) {
-        setIsCorrectPassword(false);
-        return;
-      }
-
-      if (!loginRegex.test(loginRef.current.value)) {
-        setIsCorrectLogin(false);
-        return;
-      }
-
-      if (!agreementRef.current.checked) {
-        setIsCorrectAgreement(false);
-        return;
-      }
-
-      dispatch(
-        loginAction({
-          login: loginRef.current.value,
-          password: passwordRef.current.value,
-        })
-      );
-    }
+  const onSubmit: SubmitHandler<AuthData> = (data: AuthData) => {
+    dispatch(
+      loginAction({
+        login: data.login,
+        password: data.password,
+      })
+    );
   };
 
   return (
@@ -114,7 +71,7 @@ function LoginPage(): JSX.Element {
             className="login-form"
             action="https://echo.htmlacademy.ru/"
             method="post"
-            onSubmit={handleSubmit}
+            onSubmit={(evt) => void handleSubmit(onSubmit)(evt)}
           >
             <div className="login-form__inner-wrapper">
               <h1 className="title title--size-s login-form__title">Вход</h1>
@@ -126,12 +83,11 @@ function LoginPage(): JSX.Element {
                   <input
                     type="email"
                     id="email"
-                    name="email"
+                    {...register('login', { required: true, pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/})}
                     placeholder="Адрес электронной почты"
                     required
-                    ref={loginRef}
                   />
-                  {!isCorrectLogin && (
+                  {errors.login && (
                     <p
                       style={{
                         color: 'red',
@@ -149,12 +105,11 @@ function LoginPage(): JSX.Element {
                   <input
                     type="password"
                     id="password"
-                    name="password"
+                    {...register('password', {required:true, pattern: /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]+$/})}
                     placeholder="Пароль"
                     required
-                    ref={passwordRef}
                   />
-                  {!isCorrectPassword && (
+                  {errors.password && (
                     <p
                       style={{
                         color: 'red',
@@ -179,7 +134,7 @@ function LoginPage(): JSX.Element {
                 id="id-order-agreement"
                 name="user-agreement"
                 required
-                ref={agreementRef}
+                defaultChecked
               />
               <span className="custom-checkbox__icon">
                 <svg width={20} height={17} aria-hidden="true">
@@ -197,16 +152,6 @@ function LoginPage(): JSX.Element {
                 &nbsp;и пользовательским соглашением
               </span>
             </label>
-            {!isCorrectAgreement && (
-              <p
-                style={{
-                  color: 'red',
-                  fontSize: '14px',
-                }}
-              >
-                Необходимо согласиться
-              </p>
-            )}
           </form>
         </div>
       </div>
