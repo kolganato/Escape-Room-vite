@@ -11,10 +11,13 @@ import {
   fetchBookingAction,
   fetchQuestDetailsAction,
 } from '../../store/api-actions';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Map from '../../components/map/map';
 import Spinner from '../../components/spinner';
-import { setCurrentBookingAddress, setStatusBooking } from '../../store/quests/quests-slice';
+import {
+  setCurrentBookingAddress,
+  setStatusBooking,
+} from '../../store/quests/quests-slice';
 import { Booking } from '../../types/booking';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { formateDateForPost, formateTimeForForm } from '../../utils/common';
@@ -38,12 +41,6 @@ function QuestBookingPage(): JSX.Element {
   const statusBooking = useAppSelector(getStatusBooking);
   const { register, handleSubmit } = useForm<FormData>();
 
-  const nameRef = useRef();
-  const phoneRef = useRef();
-
-  // const nameReg = /^[а-яА-ЯёЁa-zA-Z'- ]{1,}$/;
-  // const passwordReg = /^[0-9]{10,}$/;
-
   useEffect(() => {
     if (questId) {
       dispatch(fetchQuestDetailsAction(questId));
@@ -60,8 +57,14 @@ function QuestBookingPage(): JSX.Element {
 
   const questDetails = useAppSelector(getQuestDetails);
 
-  const { coverImg, coverImgWebp, previewImg, previewImgWebp, title, peopleMinMax } =
-    questDetails;
+  const {
+    coverImg,
+    coverImgWebp,
+    previewImg,
+    previewImgWebp,
+    title,
+    peopleMinMax,
+  } = questDetails;
 
   if (booking.length === 0) {
     return <Spinner />;
@@ -161,10 +164,10 @@ function QuestBookingPage(): JSX.Element {
                       <input
                         type="radio"
                         id={`today${formateTimeForForm(time)}`}
-                        {...register('date')}
-                        required
+                        {...register('date', { required: true })}
                         defaultValue={`today${formateTimeForForm(time)}`}
                         disabled={!isAvailable}
+                        required
                       />
                       <span className="custom-radio__label">{time}</span>
                     </label>
@@ -182,10 +185,10 @@ function QuestBookingPage(): JSX.Element {
                       <input
                         type="radio"
                         id={`tomorrow${formateTimeForForm(time)}`}
-                        {...register('date')}
-                        required
+                        {...register('date', { required: true })}
                         defaultValue={`tomorrow${formateTimeForForm(time)}`}
                         disabled={!isAvailable}
+                        required
                       />
                       <span className="custom-radio__label">{time}</span>
                     </label>
@@ -202,10 +205,16 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="text"
                   id="name"
-                  {...register('contactPerson')}
+                  {...register('contactPerson', {
+                    required: true,
+                    minLength: 1,
+                    maxLength: 15,
+                  })}
                   placeholder="Имя"
+                  pattern="[А-Яа-яЁёA-Za-z'- ]{1,15}"
                   required
-                  pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"
+                  minLength={1}
+                  maxLength={15}
                 />
               </div>
               <div className="custom-input booking-form__input">
@@ -215,7 +224,7 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="tel"
                   id="tel"
-                  {...register('phone')}
+                  {...register('phone', { required: true })}
                   placeholder="Телефон"
                   required
                   pattern="[0-9]{10,}"
@@ -225,15 +234,21 @@ function QuestBookingPage(): JSX.Element {
                 <label className="custom-input__label" htmlFor="person">
                   Количество участников
                 </label>
-                <input
-                  type="number"
-                  id="person"
-                  {...register('peopleCount')}
-                  placeholder="Количество участников"
-                  required
-                  min={peopleMinMax && peopleMinMax[0]}
-                  max={peopleMinMax && peopleMinMax[1]}
-                />
+                {peopleMinMax && (
+                  <input
+                    type="number"
+                    id="person"
+                    {...register('peopleCount', {
+                      min: peopleMinMax[0],
+                      max: peopleMinMax[1],
+                      required: true,
+                    })}
+                    min={peopleMinMax[0]}
+                    max={peopleMinMax[1]}
+                    required
+                    placeholder="Количество участников"
+                  />
+                )}
               </div>
               <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
                 <input
