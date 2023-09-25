@@ -39,7 +39,11 @@ function QuestBookingPage(): JSX.Element {
   const booking = useAppSelector(getBooking);
   const bookingAddress = useAppSelector(getCurrentBookingAddress);
   const statusBooking = useAppSelector(getStatusBooking);
-  const { register, handleSubmit } = useForm<FormData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
   useEffect(() => {
     if (questId) {
@@ -177,22 +181,34 @@ function QuestBookingPage(): JSX.Element {
               <fieldset className="booking-form__date-section">
                 <legend className="booking-form__date-title">Завтра</legend>
                 <div className="booking-form__date-inner-wrapper">
-                  {bookingAddress.slots.today.map(({ time, isAvailable }) => (
-                    <label
-                      className="custom-radio booking-form__date"
-                      key={time}
+                  {bookingAddress.slots.tomorrow.map(
+                    ({ time, isAvailable }) => (
+                      <label
+                        className="custom-radio booking-form__date"
+                        key={time}
+                      >
+                        <input
+                          type="radio"
+                          id={`tomorrow${formateTimeForForm(time)}`}
+                          {...register('date', { required: true })}
+                          defaultValue={`tomorrow${formateTimeForForm(time)}`}
+                          disabled={!isAvailable}
+                          required
+                        />
+                        <span className="custom-radio__label">{time}</span>
+                      </label>
+                    )
+                  )}
+                  {errors.date && (
+                    <p
+                      style={{
+                        color: 'red',
+                        fontSize: '14px',
+                      }}
                     >
-                      <input
-                        type="radio"
-                        id={`tomorrow${formateTimeForForm(time)}`}
-                        {...register('date', { required: true })}
-                        defaultValue={`tomorrow${formateTimeForForm(time)}`}
-                        disabled={!isAvailable}
-                        required
-                      />
-                      <span className="custom-radio__label">{time}</span>
-                    </label>
-                  ))}
+                      Выберите время
+                    </p>
+                  )}
                 </div>
               </fieldset>
             </fieldset>
@@ -209,13 +225,23 @@ function QuestBookingPage(): JSX.Element {
                     required: true,
                     minLength: 1,
                     maxLength: 15,
+                    pattern: /^[a-zA-Zа-яА-ЯёЁ' -]*$/,
                   })}
                   placeholder="Имя"
-                  pattern="[А-Яа-яЁёA-Za-z'- ]{1,15}"
                   required
                   minLength={1}
                   maxLength={15}
                 />
+                {errors.contactPerson && (
+                  <p
+                    style={{
+                      color: 'red',
+                      fontSize: '14px',
+                    }}
+                  >
+                    Введите валидное имя
+                  </p>
+                )}
               </div>
               <div className="custom-input booking-form__input">
                 <label className="custom-input__label" htmlFor="tel">
@@ -224,11 +250,26 @@ function QuestBookingPage(): JSX.Element {
                 <input
                   type="tel"
                   id="tel"
-                  {...register('phone', { required: true })}
+                  {...register('phone', {
+                    required: true,
+                    pattern: /[\d+]/,
+                    minLength: 11,
+                    maxLength: 11
+                  })}
                   placeholder="Телефон"
                   required
-                  pattern="[0-9]{10,}"
+                  pattern="[\d+]{10,}"
                 />
+                {errors.phone && (
+                  <p
+                    style={{
+                      color: 'red',
+                      fontSize: '14px',
+                    }}
+                  >
+                    Введите номер в формате 79009009090
+                  </p>
+                )}
               </div>
               <div className="custom-input booking-form__input">
                 <label className="custom-input__label" htmlFor="person">
@@ -248,6 +289,17 @@ function QuestBookingPage(): JSX.Element {
                     required
                     placeholder="Количество участников"
                   />
+                )}
+                {errors.peopleCount && peopleMinMax && (
+                  <p
+                    style={{
+                      color: 'red',
+                      fontSize: '14px',
+                    }}
+                  >
+                    Диапазон участников от {peopleMinMax[0]} до{' '}
+                    {peopleMinMax[1]}
+                  </p>
                 )}
               </div>
               <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">

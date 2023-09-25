@@ -9,7 +9,6 @@ import {
 import { setLoginStatus } from '../../store/user/user-slice';
 import { loginAction } from '../../store/api-actions';
 import { Helmet } from 'react-helmet-async';
-import browserHistory from '../../browser-history';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { AuthData } from '../../types/auth-data';
 
@@ -19,7 +18,11 @@ function LoginPage(): JSX.Element {
   const loginStatus = useAppSelector(getLoginStatus);
   const authStatus = useAppSelector(getAuthorizationStatus);
 
-  const {register, handleSubmit, formState: { errors }} = useForm<AuthData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AuthData>();
 
   useEffect(() => {
     if (authStatus === AuthorizationStatus.Auth) {
@@ -28,9 +31,7 @@ function LoginPage(): JSX.Element {
   }, [dispatch, authStatus]);
 
   useEffect(() => {
-    if (
-      loginStatus === Status.Success
-    ) {
+    if (loginStatus === Status.Success) {
       dispatch(setLoginStatus(Status.Idle));
       dispatch(redirectToRoute(AppRoute.Root));
     }
@@ -83,7 +84,11 @@ function LoginPage(): JSX.Element {
                   <input
                     type="email"
                     id="email"
-                    {...register('login', { required: true, pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/})}
+                    {...register('login', {
+                      required: true,
+                      pattern:
+                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    })}
                     placeholder="Адрес электронной почты"
                     required
                   />
@@ -105,7 +110,10 @@ function LoginPage(): JSX.Element {
                   <input
                     type="password"
                     id="password"
-                    {...register('password', {required:true, pattern: /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]+$/})}
+                    {...register('password', {
+                      required: true,
+                      pattern: /^(?=.*\d)(?=.*[a-zA-Z])[a-zA-Z0-9]+$/,
+                    })}
                     placeholder="Пароль"
                     required
                   />
