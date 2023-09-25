@@ -1,4 +1,9 @@
+import Map from '../../components/map/map';
+import { COORDS_ADDRESS_OFFICE } from '../../utils/common';
+
 function ContactsPage(): JSX.Element {
+  const locationCity = COORDS_ADDRESS_OFFICE;
+
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
@@ -59,7 +64,7 @@ function ContactsPage(): JSX.Element {
           </dl>
           <div className="contacts__map">
             <div className="map">
-              <div className="map__container" />
+              <Map location={locationCity} isOffice />
             </div>
           </div>
         </div>
