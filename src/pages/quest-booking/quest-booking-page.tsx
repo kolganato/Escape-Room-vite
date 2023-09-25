@@ -57,7 +57,10 @@ function QuestBookingPage(): JSX.Element {
       dispatch(redirectToRoute(AppRoute.MyQuests));
       dispatch(setStatusBooking(Status.Idle));
     }
-  }, [statusBooking, dispatch]);
+    if (statusBooking === Status.Error) {
+      dispatch(fetchBookingAction(questId));
+    }
+  }, [statusBooking, dispatch, questId]);
 
   const questDetails = useAppSelector(getQuestDetails);
 
@@ -254,7 +257,7 @@ function QuestBookingPage(): JSX.Element {
                     required: true,
                     pattern: /[\d+]/,
                     minLength: 11,
-                    maxLength: 11
+                    maxLength: 11,
                   })}
                   placeholder="Телефон"
                   required
@@ -325,7 +328,15 @@ function QuestBookingPage(): JSX.Element {
               Забронировать
             </button>
             {statusBooking === Status.Error && (
-              <p>Не удалось забронировать квест</p>
+              <p
+                style={{
+                  color: 'red',
+                  fontSize: '18px',
+                }}
+              >
+                На данное время только что забронировал другой клиент, выберите
+                другое время
+              </p>
             )}
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--agreement">
               <input
